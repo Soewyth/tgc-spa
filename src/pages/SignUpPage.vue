@@ -14,6 +14,10 @@
       @submit.prevent="handleSubmit"
     >
       <NSpace vertical :size="18">
+        <NAlert v-if="errorMessage" type="error" :show-icon="true">
+          {{ errorMessage }}
+        </NAlert>
+
         <NFormItem path="username" label="Nom d'utilisateur">
           <NInput
             v-model:value="formValue.username"
@@ -70,6 +74,7 @@ const formRef = ref<FormInst | null>(null)
 const router = useRouter()
 const message = useMessage()
 const isSubmitting = ref(false)
+const errorMessage = ref('')
 
 const formValue = reactive({
   username: '',
@@ -99,17 +104,19 @@ const rules: FormRules = {
 }
 
 const handleSubmit = async () => {
+  // Run Naive UI form validation before API call
   await formRef.value?.validate()
 
   try {
+    errorMessage.value = ''
     isSubmitting.value = true
     await authStore.signUp(formValue)
     message.success('Compte cree')
+    // Go to the protected home page after account creation
     await router.push(ROUTES.HOME)
   } catch (error) {
-    const nextMessage =
+    errorMessage.value =
       error instanceof Error ? error.message : 'Impossible de creer le compte'
-    message.error(nextMessage)
   } finally {
     isSubmitting.value = false
   }

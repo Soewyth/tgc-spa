@@ -1,13 +1,15 @@
 import type { DeckCard } from './card.js'
 
 export interface Deck {
-  id: number
+  id: string
   name: string
-  userId: number
+  userId: string
+  createdAt?: string
+  updatedAt?: string
   cards: DeckCard[]
 }
 
 export interface DeckPayload {
   name: string
-  cards: number[] // tableau de 10 cardId
+  cards: (string | number)[]
 }

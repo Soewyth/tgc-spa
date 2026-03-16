@@ -14,6 +14,10 @@
       @submit.prevent="handleSubmit"
     >
       <NSpace vertical :size="18">
+        <NAlert v-if="errorMessage" type="error" :show-icon="true">
+          {{ errorMessage }}
+        </NAlert>
+
         <NFormItem path="email" label="Email">
           <NInput
             v-model:value="formValue.email"
@@ -62,6 +66,7 @@ const formRef = ref<FormInst | null>(null)
 const router = useRouter()
 const message = useMessage()
 const isSubmitting = ref(false)
+const errorMessage = ref('')
 
 const formValue = reactive({
   email: '',
@@ -83,17 +88,19 @@ const rules: FormRules = {
 }
 
 const handleSubmit = async () => {
+  // Run Naive UI form validation before API call
   await formRef.value?.validate()
 
   try {
+    errorMessage.value = ''
     isSubmitting.value = true
     await authStore.signIn(formValue)
     message.success('Connexion reussie')
+    // Go to the protected home page after login
     await router.push(ROUTES.HOME)
   } catch (error) {
-    const nextMessage =
+    errorMessage.value =
       error instanceof Error ? error.message : 'Impossible de se connecter'
-    message.error(nextMessage)
   } finally {
     isSubmitting.value = false
   }
