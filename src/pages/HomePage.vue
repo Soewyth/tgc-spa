@@ -1,14 +1,12 @@
 <template>
   <div class="container">
-    <NCard title="Espace joueur" class="home-card">
-      <NSpace vertical :size="12">
-        <NText
-          >Connexion reussie. Les tickets 2 et 3 rempliront cette page.</NText
-        >
-      </NSpace>
-    </NCard>
+    <DeckList />
   </div>
 </template>
+
+<script setup lang="ts">
+import DeckList from '../components/decks/DeckList.vue'
+</script>
 
 <style scoped>
 .container {

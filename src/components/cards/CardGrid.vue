@@ -24,7 +24,7 @@ const props = withDefaults(
     cards: Card[]
     size?: 'sm' | 'md'
     selectable?: boolean
-    selectedIds?: number[]
+    selectedIds?: string[]
     maxSelected?: number
   }>(),
   {
@@ -36,18 +36,18 @@ const props = withDefaults(
 )
 
 const emit =
-  defineEmits<(e: 'update:selectedIds' | 'toggle', ids: number[]) => void>()
+  defineEmits<(e: 'update:selectedIds' | 'toggle', ids: string[]) => void>()
 
 const selectedSet = computed(() => new Set(props.selectedIds))
 
-const isCardDisabled = (cardId: number) => {
+const isCardDisabled = (cardId: string) => {
   if (!props.selectable) return false
   if (selectedSet.value.has(cardId)) return false
   if (props.maxSelected === undefined) return false
   return selectedSet.value.size >= props.maxSelected
 }
 
-const toggleCard = (cardId: number) => {
+const toggleCard = (cardId: string) => {
   if (!props.selectable) return
   if (isCardDisabled(cardId)) return
 

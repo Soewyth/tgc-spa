@@ -19,7 +19,7 @@ export type PokemonType =
   | 'Fairy'
 
 export interface Card {
-  id: number
+  id: string
   name: string
   hp: number
   attack: number
@@ -30,7 +30,8 @@ export interface Card {
 }
 
 export interface DeckCard {
-  id: number
-  deckId: number
-  cardId: number
+  id: string
+  deckId: string
+  cardId: string
+  card?: Card
 }

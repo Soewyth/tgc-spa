@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import DeckCreatePage from './pages/DeckCreatePage.vue'
+import DeckDetailPage from './pages/DeckDetailPage.vue'
+import DeckEditPage from './pages/DeckEditPage.vue'
 import HomePage from './pages/HomePage.vue'
 import SignInPage from './pages/SignInPage.vue'
 import SignUpPage from './pages/SignUpPage.vue'
@@ -9,6 +12,11 @@ export const ROUTES = {
   HOME: '/',
   SIGN_IN: '/connexion',
   SIGN_UP: '/inscription',
+  DECK_CREATE: '/decks/creation',
+  DECK_DETAIL: '/decks/:id',
+  DECK_EDIT: '/decks/:id/modifier',
+  deckDetail: (id: string | number) => `/decks/${id}`,
+  deckEdit: (id: string | number) => `/decks/${id}/modifier`,
 } as const
 
 const routes = [
@@ -23,6 +31,21 @@ const routes = [
     path: ROUTES.SIGN_UP,
     component: SignUpPage,
     meta: { guestOnly: true },
+  },
+  {
+    path: ROUTES.DECK_CREATE,
+    component: DeckCreatePage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: ROUTES.DECK_DETAIL,
+    component: DeckDetailPage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: ROUTES.DECK_EDIT,
+    component: DeckEditPage,
+    meta: { requiresAuth: true },
   },
 ]
 

@@ -71,7 +71,7 @@ const props = withDefaults(
   },
 )
 
-const emit = defineEmits<(e: 'select', cardId: number) => void>()
+const emit = defineEmits<(e: 'select', cardId: string) => void>()
 
 const { getTypeColor, hpColor: getHpColor } = useColors()
 
