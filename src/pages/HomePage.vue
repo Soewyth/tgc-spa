@@ -5,9 +5,6 @@
         <NText
           >Connexion reussie. Les tickets 2 et 3 rempliront cette page.</NText
         >
-        <NText depth="3"
-          >Tu peux maintenant gerer la session et les guards d'acces.</NText
-        >
       </NSpace>
     </NCard>
   </div>
