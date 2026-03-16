@@ -50,11 +50,38 @@
       </NList>
     </NSpin>
   </NCard>
+
+  <NModal
+    v-model:show="isDeleteModalOpen"
+    preset="card"
+    title="Supprimer le deck"
+    :mask-closable="false"
+    style="width: min(92vw, 420px)"
+  >
+    <NText>
+      Confirmer la suppression de
+      <NText strong>{{ pendingDeleteDeckName }}</NText>
+      ?
+    </NText>
+
+    <template #footer>
+      <NSpace justify="end" :size="8">
+        <NButton @click="closeDeleteModal">Annuler</NButton>
+        <NButton
+          type="error"
+          :loading="Boolean(deletingDeckId)"
+          @click="confirmDelete"
+        >
+          Supprimer
+        </NButton>
+      </NSpace>
+    </template>
+  </NModal>
 </template>
 
 <script setup lang="ts">
 import { useMessage } from 'naive-ui'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useApi } from '../../composables/useApi.js'
@@ -68,6 +95,13 @@ const message = useMessage()
 const decks = ref<Deck[]>([])
 const isLoading = ref(false)
 const deletingDeckId = ref<Deck['id'] | null>(null)
+const pendingDeleteDeckId = ref<Deck['id'] | null>(null)
+const isDeleteModalOpen = ref(false)
+
+const pendingDeleteDeckName = computed(() => {
+  const deck = decks.value.find((item) => item.id === pendingDeleteDeckId.value)
+  return deck?.name ?? 'ce deck'
+})
 
 const fetchDecks = async () => {
   try {
@@ -94,15 +128,26 @@ const handleCreate = async () => {
   await router.push(ROUTES.DECK_CREATE)
 }
 
-const handleDelete = async (deckId: Deck['id']) => {
-  const confirmed = window.confirm('Supprimer ce deck ?')
-  if (!confirmed) return
+const closeDeleteModal = () => {
+  if (deletingDeckId.value) return
+  isDeleteModalOpen.value = false
+  pendingDeleteDeckId.value = null
+}
+
+const handleDelete = (deckId: Deck['id']) => {
+  pendingDeleteDeckId.value = deckId
+  isDeleteModalOpen.value = true
+}
+
+const confirmDelete = async () => {
+  if (!pendingDeleteDeckId.value) return
 
   try {
-    deletingDeckId.value = deckId
-    await api.deleteDeck(deckId)
+    deletingDeckId.value = pendingDeleteDeckId.value
+    await api.deleteDeck(pendingDeleteDeckId.value)
     message.success('Deck supprime')
     await fetchDecks()
+    closeDeleteModal()
   } catch (error) {
     const nextMessage =
       error instanceof Error ? error.message : 'Impossible de supprimer ce deck'
