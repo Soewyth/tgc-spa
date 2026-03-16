@@ -83,12 +83,14 @@ const rules: FormRules = {
 }
 
 const handleSubmit = async () => {
+  // Run Naive UI form validation before API call
   await formRef.value?.validate()
 
   try {
     isSubmitting.value = true
     await authStore.signIn(formValue)
     message.success('Connexion reussie')
+    // Go to the protected home page after login
     await router.push(ROUTES.HOME)
   } catch (error) {
     const nextMessage =

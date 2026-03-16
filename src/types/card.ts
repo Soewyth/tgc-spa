@@ -25,7 +25,8 @@ export interface Card {
   attack: number
   type: PokemonType
   pokedexNumber: number
-  imgUrl: string
+  imageUrl: string
+  imgUrl?: string
 }
 
 export interface DeckCard {

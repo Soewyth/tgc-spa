@@ -1,57 +1,75 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
 
 import { useApi } from '../composables/useApi.js'
 import { useStorage } from '../composables/useStorage.js'
-import type { SignInPayload, SignUpPayload, User } from '../types/index.js'
+import type {
+  AuthState,
+  SignInPayload,
+  SignUpPayload,
+  User,
+} from '../types/index.js'
 
 const TOKEN_KEY = 'token'
 const USER_KEY = 'user'
 
-export const useAuthStore = defineStore('auth', () => {
-  const api = useApi()
-  const storage = useStorage()
+const api = useApi()
+const storage = useStorage()
 
-  const token = ref<string | null>(storage.get<string>(TOKEN_KEY))
-  const user = ref<User | null>(storage.get<User>(USER_KEY))
+export const useAuthStore = defineStore('auth', {
+  // Rehydrate auth state from localStorage on app load
+  state: (): AuthState => ({
+    token: storage.get<string>(TOKEN_KEY),
+    user: storage.get<User>(USER_KEY),
+  }),
 
-  const isAuthenticated = computed(() => Boolean(token.value && user.value))
+  getters: {
+    isAuthenticated: (state) => Boolean(state.token && state.user),
+    username: (state) => state.user?.username ?? '',
+  },
 
-  const setSession = (nextToken: string, nextUser: User) => {
-    token.value = nextToken
-    user.value = nextUser
-    storage.set(TOKEN_KEY, nextToken)
-    storage.set(USER_KEY, nextUser)
-  }
+  actions: {
+    // Keep Pinia state and localStorage in sync
+    setSession(nextToken: string, nextUser: User) {
+      this.token = nextToken
+      this.user = nextUser
+      storage.set(TOKEN_KEY, nextToken)
+      storage.set(USER_KEY, nextUser)
+    },
 
-  const clearSession = () => {
-    token.value = null
-    user.value = null
-    storage.remove(TOKEN_KEY, USER_KEY)
-  }
+    clearSession() {
+      this.token = null
+      this.user = null
+      storage.remove(TOKEN_KEY, USER_KEY)
+    },
 
-  const signIn = async (payload: SignInPayload) => {
-    const response = await api.signIn(payload)
-    setSession(response.token, response.user)
-    return response
-  }
+    async signIn(payload: SignInPayload) {
+      try {
+        const response = await api.signIn(payload)
+        // Persist session right after successful login
+        this.setSession(response.token, response.user)
+        return response
+      } catch (error) {
+        throw error instanceof Error
+          ? error
+          : new Error('Impossible de se connecter')
+      }
+    },
 
-  const signUp = async (payload: SignUpPayload) => {
-    const response = await api.signUp(payload)
-    setSession(response.token, response.user)
-    return response
-  }
+    async signUp(payload: SignUpPayload) {
+      try {
+        const response = await api.signUp(payload)
+        // Auto-login behavior after account creation
+        this.setSession(response.token, response.user)
+        return response
+      } catch (error) {
+        throw error instanceof Error
+          ? error
+          : new Error('Impossible de creer le compte')
+      }
+    },
 
-  const signOut = () => {
-    clearSession()
-  }
-
-  return {
-    token,
-    user,
-    isAuthenticated,
-    signIn,
-    signUp,
-    signOut,
-  }
+    signOut() {
+      this.clearSession()
+    },
+  },
 })

@@ -12,6 +12,7 @@ export const ROUTES = {
 } as const
 
 const routes = [
+  // Private route
   { path: ROUTES.HOME, component: HomePage, meta: { requiresAuth: true } },
   {
     path: ROUTES.SIGN_IN,
@@ -33,10 +34,12 @@ const router = createRouter({
 router.beforeEach((to) => {
   const authStore = useAuthStore()
 
+  // Redirect guests to sign-in when a route requires auth
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return ROUTES.SIGN_IN
   }
 
+  // Redirect authenticated users away from auth pages.
   if (to.meta.guestOnly && authStore.isAuthenticated) {
     return ROUTES.HOME
   }

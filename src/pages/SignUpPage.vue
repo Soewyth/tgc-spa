@@ -99,12 +99,14 @@ const rules: FormRules = {
 }
 
 const handleSubmit = async () => {
+  // Run Naive UI form validation before API call
   await formRef.value?.validate()
 
   try {
     isSubmitting.value = true
     await authStore.signUp(formValue)
     message.success('Compte cree')
+    // Go to the protected home page after account creation
     await router.push(ROUTES.HOME)
   } catch (error) {
     const nextMessage =

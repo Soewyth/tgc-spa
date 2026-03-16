@@ -24,3 +24,6 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# To delete when finish (for myself to avoid to return to figma)
+image_a_supp/
