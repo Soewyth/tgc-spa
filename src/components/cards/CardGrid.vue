@@ -6,8 +6,8 @@
       :card="card"
       :size="size"
       :selectable="selectable"
-      :selected="selectedSet.has(card.id)"
-      :disabled="isCardDisabled(card.id)"
+      :selected="selectedSet.has(String(card.id))"
+      :disabled="isCardDisabled(String(card.id))"
       @select="toggleCard"
     />
   </NSpace>
@@ -24,7 +24,7 @@ const props = withDefaults(
     cards: Card[]
     size?: 'sm' | 'md'
     selectable?: boolean
-    selectedIds?: string[]
+    selectedIds?: (string | number)[]
     maxSelected?: number
   }>(),
   {
@@ -38,25 +38,27 @@ const props = withDefaults(
 const emit =
   defineEmits<(e: 'update:selectedIds' | 'toggle', ids: string[]) => void>()
 
-const selectedSet = computed(() => new Set(props.selectedIds))
+const selectedSet = computed(() => new Set(props.selectedIds.map(String)))
 
 const isCardDisabled = (cardId: string) => {
+  const normalizedId = String(cardId)
   if (!props.selectable) return false
-  if (selectedSet.value.has(cardId)) return false
+  if (selectedSet.value.has(normalizedId)) return false
   if (props.maxSelected === undefined) return false
   return selectedSet.value.size >= props.maxSelected
 }
 
-const toggleCard = (cardId: string) => {
+const toggleCard = (cardId: string | number) => {
+  const normalizedId = String(cardId)
   if (!props.selectable) return
-  if (isCardDisabled(cardId)) return
+  if (isCardDisabled(normalizedId)) return
 
   const nextSelected = new Set(selectedSet.value)
 
-  if (nextSelected.has(cardId)) {
-    nextSelected.delete(cardId)
+  if (nextSelected.has(normalizedId)) {
+    nextSelected.delete(normalizedId)
   } else {
-    nextSelected.add(cardId)
+    nextSelected.add(normalizedId)
   }
 
   const nextIds = [...nextSelected]

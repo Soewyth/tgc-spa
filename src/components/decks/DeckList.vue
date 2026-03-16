@@ -6,6 +6,10 @@
       >
     </template>
 
+    <NAlert v-if="errorMessage" type="error" :show-icon="true" class="mb-12">
+      {{ errorMessage }}
+    </NAlert>
+
     <NSpin :show="isLoading">
       <NEmpty
         v-if="!isLoading && decks.length === 0"
@@ -25,6 +29,17 @@
                 <NText depth="3">{{ deck.cards.length }} cartes</NText>
               </NSpace>
             </template>
+
+            <div class="deck-preview" aria-label="Apercu des cartes du deck">
+              <img
+                v-for="card in getDeckPreviewCards(deck)"
+                :key="`${deck.id}-${card.id}`"
+                :src="card.imageUrl || card.imgUrl || ''"
+                :alt="card.name"
+                class="deck-preview__img"
+                loading="lazy"
+              />
+            </div>
 
             <template #footer>
               <NSpace :size="8" justify="end">
@@ -86,17 +101,27 @@ import { useRouter } from 'vue-router'
 
 import { useApi } from '../../composables/useApi.js'
 import { ROUTES } from '../../router.js'
-import type { Deck } from '../../types/index.js'
+import type { Card, Deck } from '../../types/index.js'
 
 const api = useApi()
 const router = useRouter()
 const message = useMessage()
 
 const decks = ref<Deck[]>([])
+const cardCatalog = ref<Card[]>([])
 const isLoading = ref(false)
 const deletingDeckId = ref<Deck['id'] | null>(null)
 const pendingDeleteDeckId = ref<Deck['id'] | null>(null)
 const isDeleteModalOpen = ref(false)
+const errorMessage = ref('')
+
+const cardCatalogById = computed(() => {
+  const byId = new Map<string, Card>()
+  for (const card of cardCatalog.value) {
+    byId.set(String(card.id), card)
+  }
+  return byId
+})
 
 const pendingDeleteDeckName = computed(() => {
   const deck = decks.value.find((item) => item.id === pendingDeleteDeckId.value)
@@ -105,15 +130,28 @@ const pendingDeleteDeckName = computed(() => {
 
 const fetchDecks = async () => {
   try {
+    errorMessage.value = ''
     isLoading.value = true
     decks.value = await api.getMyDecks()
+    try {
+      cardCatalog.value = await api.getCards()
+    } catch {
+      cardCatalog.value = []
+    }
   } catch (error) {
-    const nextMessage =
+    errorMessage.value =
       error instanceof Error ? error.message : 'Impossible de charger les decks'
-    message.error(nextMessage)
   } finally {
     isLoading.value = false
   }
+}
+
+const getDeckPreviewCards = (deck: Deck): Card[] => {
+  return deck.cards
+    .map(
+      (entry) => entry.card || cardCatalogById.value.get(String(entry.cardId)),
+    )
+    .filter((card): card is Card => Boolean(card))
 }
 
 const handleView = async (deckId: Deck['id']) => {
@@ -143,15 +181,16 @@ const confirmDelete = async () => {
   if (!pendingDeleteDeckId.value) return
 
   try {
+    errorMessage.value = ''
     deletingDeckId.value = pendingDeleteDeckId.value
     await api.deleteDeck(pendingDeleteDeckId.value)
+    isDeleteModalOpen.value = false
+    pendingDeleteDeckId.value = null
     message.success('Deck supprime')
     await fetchDecks()
-    closeDeleteModal()
   } catch (error) {
-    const nextMessage =
+    errorMessage.value =
       error instanceof Error ? error.message : 'Impossible de supprimer ce deck'
-    message.error(nextMessage)
   } finally {
     deletingDeckId.value = null
   }
@@ -165,5 +204,27 @@ onMounted(() => {
 <style scoped>
 .deck-list {
   width: min(100%, 860px);
+}
+
+.mb-12 {
+  margin-bottom: 12px;
+}
+
+.deck-preview {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-top: 10px;
+}
+
+.deck-preview__img {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+  flex: 0 0 auto;
 }
 </style>

@@ -2,6 +2,10 @@
   <div class="container">
     <NCard title="Creer un deck" class="page-card">
       <NSpace vertical :size="18">
+        <NAlert v-if="errorMessage" type="error" :show-icon="true">
+          {{ errorMessage }}
+        </NAlert>
+
         <NInput
           v-model:value="deckName"
           size="large"
@@ -70,6 +74,7 @@ const selectedCardIds = ref<string[]>([])
 
 const isLoadingCards = ref(false)
 const isSubmitting = ref(false)
+const errorMessage = ref('')
 
 const selectedCount = computed(() => selectedCardIds.value.length)
 const hasValidDeckName = computed(() => deckName.value.trim().length > 0)
@@ -81,14 +86,14 @@ const canSubmit = computed(
 
 const fetchCards = async () => {
   try {
+    errorMessage.value = ''
     isLoadingCards.value = true
     cards.value = await api.getCards()
   } catch (error) {
-    const nextMessage =
+    errorMessage.value =
       error instanceof Error
         ? error.message
         : 'Impossible de charger les cartes'
-    message.error(nextMessage)
   } finally {
     isLoadingCards.value = false
   }
@@ -98,19 +103,29 @@ const handleCreateDeck = async () => {
   if (!canSubmit.value) return
 
   try {
+    errorMessage.value = ''
     isSubmitting.value = true
+
+    const cardsById = new Map(
+      cards.value.map((card) => {
+        const rawId = (card as { id: string | number }).id
+        return [String(rawId), rawId]
+      }),
+    )
+    const payloadCardIds = selectedCardIds.value.map(
+      (id) => cardsById.get(id) ?? id,
+    )
 
     await api.createDeck({
       name: deckName.value.trim(),
-      cards: selectedCardIds.value,
+      cards: payloadCardIds,
     })
 
     message.success('Deck cree')
     await router.push(ROUTES.HOME)
   } catch (error) {
-    const nextMessage =
+    errorMessage.value =
       error instanceof Error ? error.message : 'Impossible de creer le deck'
-    message.error(nextMessage)
   } finally {
     isSubmitting.value = false
   }
@@ -134,15 +149,5 @@ onMounted(() => {
 
 .counter-text {
   font-weight: 700;
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding-top: 16px;
-  }
-
-  .page-card {
-    border-radius: 12px;
-  }
 }
 </style>

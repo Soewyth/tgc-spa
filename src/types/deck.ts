@@ -11,5 +11,5 @@ export interface Deck {
 
 export interface DeckPayload {
   name: string
-  cards: string[]
+  cards: (string | number)[]
 }
