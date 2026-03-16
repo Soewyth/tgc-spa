@@ -21,7 +21,7 @@ services:
 
   api:
     image: seyrinian/tcg-api:latest
-    platform: linux/arm64
+    platform: linux/amd64
     container_name: tcg_api
     restart: unless-stopped
     ports:

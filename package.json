@@ -25,10 +25,10 @@
     "pinia": "2.3.1",
     "socket.io-client": "4.8.3",
     "vue": "3.5.29",
-    "vue-router": "4.6.4"
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@vfourny/node-toolkit": "1.1.6",
+    "@vfourny/node-toolkit": "^1.1.6",
     "@vitejs/plugin-vue": "5.2.4",
     "eslint": "9.39.3",
     "husky": "9.1.7",
