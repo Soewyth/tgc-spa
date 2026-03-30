@@ -1,7 +1,7 @@
 <template>
   <NSpace wrap :size="[14, 14]" justify="start">
     <PokemonCard
-      v-for="card in cards"
+      v-for="card in filteredCards"
       :key="card.id"
       :card="card"
       :size="size"
@@ -26,12 +26,14 @@ const props = withDefaults(
     selectable?: boolean
     selectedIds?: (string | number)[]
     maxSelected?: number
+    searchTerm?: string
   }>(),
   {
     size: 'md',
     selectable: false,
     selectedIds: () => [],
     maxSelected: undefined,
+    searchTerm: '',
   },
 )
 
@@ -39,6 +41,12 @@ const emit =
   defineEmits<(e: 'update:selectedIds' | 'toggle', ids: string[]) => void>()
 
 const selectedSet = computed(() => new Set(props.selectedIds.map(String)))
+
+const filteredCards = computed(() => {
+  const term = props.searchTerm.trim().toLowerCase()
+  if (!term) return props.cards
+  return props.cards.filter((card) => card.name.toLowerCase().includes(term))
+})
 
 const isCardDisabled = (cardId: string) => {
   const normalizedId = String(cardId)

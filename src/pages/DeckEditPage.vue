@@ -20,6 +20,14 @@
             show-count
           />
 
+          <NInput
+            v-model:value="searchTerm"
+            size="large"
+            placeholder="Rechercher une carte"
+            clearable
+            class="mb-12"
+          />
+
           <NSpace justify="space-between" align="center">
             <NText class="counter-text"
               >{{ selectedCount }}/{{ MAX_CARDS }} cartes selectionnees</NText
@@ -38,6 +46,7 @@
             selectable
             :selected-ids="selectedCardIds"
             :max-selected="MAX_CARDS"
+            :search-term="searchTerm"
             @update:selected-ids="selectedCardIds = $event"
           />
 
@@ -78,6 +87,7 @@ const cards = ref<Card[]>([])
 const deck = ref<Deck | null>(null)
 const deckName = ref('')
 const selectedCardIds = ref<string[]>([])
+const searchTerm = ref('')
 
 const isLoading = ref(false)
 const isSubmitting = ref(false)
