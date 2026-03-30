@@ -1,11 +1,14 @@
 <template>
   <div class="container">
+    <!-- Card for deck creation form -->
     <NCard title="Creer un deck" class="page-card">
       <NSpace vertical :size="18">
+        <!-- Error alert -->
         <NAlert v-if="errorMessage" type="error" :show-icon="true">
           {{ errorMessage }}
         </NAlert>
 
+        <!-- Deck name input -->
         <NInput
           v-model:value="deckName"
           size="large"
@@ -14,6 +17,7 @@
           show-count
         />
 
+        <!-- Card search input -->
         <NInput
           v-model:value="searchTerm"
           size="large"
@@ -22,10 +26,11 @@
           class="mb-12"
         />
 
+        <!-- Selected cards counter -->
         <NSpace justify="space-between" align="center">
-          <NText class="counter-text"
-            >{{ selectedCount }}/{{ MAX_CARDS }} cartes selectionnees</NText
-          >
+          <NText class="counter-text">
+            {{ selectedCount }}/{{ MAX_CARDS }} cartes selectionnees
+          </NText>
         </NSpace>
 
         <NSpin :show="isLoadingCards">
@@ -34,6 +39,7 @@
             description="Aucune carte disponible"
           />
 
+          <!-- Card selection grid -->
           <CardGrid
             v-else
             :cards="cards"
@@ -46,6 +52,7 @@
           />
         </NSpin>
 
+        <!-- Create deck button -->
         <NButton
           type="primary"
           size="large"
@@ -150,11 +157,17 @@ onMounted(() => {
 .container {
   display: flex;
   justify-content: center;
-  padding-top: 28px;
+  padding: 28px 16px 24px;
 }
 
 .page-card {
   width: min(100%, 860px);
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 16px 12px 20px;
+  }
 }
 
 .counter-text {

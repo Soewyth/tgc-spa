@@ -111,11 +111,11 @@ const handleClick = () => {
 }
 
 .size-sm {
-  width: 180px;
+  width: 100%;
 }
 
 .size-md {
-  width: 230px;
+  width: 100%;
 }
 
 .pokemon-card.is-selectable {
