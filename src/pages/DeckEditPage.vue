@@ -99,7 +99,7 @@ const canSubmit = computed(
     !isLoading.value &&
     !isSubmitting.value,
 )
-
+// fetchData -> fetch the deck details and the card catalog from the api, handle loading and error states
 const fetchData = async () => {
   if (!deckId.value) {
     errorMessage.value = 'Identifiant de deck invalide'
@@ -145,7 +145,7 @@ const fetchData = async () => {
     isLoading.value = false
   }
 }
-
+// handleUpdateDeck -> called when the user clicks on "Enregistrer les modifications". send api requests to update the deck details
 const handleUpdateDeck = async () => {
   if (!canSubmit.value || !deckId.value) return
 

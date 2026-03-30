@@ -83,7 +83,7 @@ const canSubmit = computed(
   () =>
     hasValidDeckName.value && hasExactCardCount.value && !isSubmitting.value,
 )
-
+// fetch all the deck when the component is mounted
 const fetchCards = async () => {
   try {
     errorMessage.value = ''
@@ -98,7 +98,7 @@ const fetchCards = async () => {
     isLoadingCards.value = false
   }
 }
-
+// handleCreateDeck -> called when the use clicks on "creer le deck". send api requests
 const handleCreateDeck = async () => {
   if (!canSubmit.value) return
 
@@ -130,7 +130,7 @@ const handleCreateDeck = async () => {
     isSubmitting.value = false
   }
 }
-
+// Fetch the cards when the component is mounted
 onMounted(() => {
   void fetchCards()
 })
