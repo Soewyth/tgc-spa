@@ -6,18 +6,26 @@
       >
     </template>
 
+    <NInput
+      v-model:value="searchTerm"
+      size="large"
+      placeholder="Rechercher un deck"
+      clearable
+      class="mb-12"
+    />
+
     <NAlert v-if="errorMessage" type="error" :show-icon="true" class="mb-12">
       {{ errorMessage }}
     </NAlert>
 
     <NSpin :show="isLoading">
       <NEmpty
-        v-if="!isLoading && decks.length === 0"
+        v-if="!isLoading && filteredDecks.length === 0"
         description="Aucun deck pour le moment"
       />
 
       <NList v-else hoverable bordered>
-        <NListItem v-for="deck in decks" :key="deck.id">
+        <NListItem v-for="deck in filteredDecks" :key="deck.id">
           <NThing>
             <template #header>
               <NSpace
@@ -108,6 +116,13 @@ const router = useRouter()
 const message = useMessage()
 
 const decks = ref<Deck[]>([])
+const searchTerm = ref('')
+const filteredDecks = computed(() => {
+  const term = searchTerm.value.trim().toLowerCase()
+  if (!term) return decks.value
+  return decks.value.filter((deck) => deck.name.toLowerCase().includes(term))
+})
+
 const cardCatalog = ref<Card[]>([])
 const isLoading = ref(false)
 const deletingDeckId = ref<Deck['id'] | null>(null)
