@@ -12,10 +12,12 @@ import DeckList from '../components/decks/DeckList.vue'
 .container {
   display: flex;
   justify-content: center;
-  padding-top: 40px;
+  padding: 40px 16px 24px;
 }
 
-.home-card {
-  width: min(100%, 640px);
+@media (max-width: 640px) {
+  .container {
+    padding: 16px 12px 20px;
+  }
 }
 </style>

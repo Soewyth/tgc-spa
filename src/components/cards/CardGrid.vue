@@ -1,16 +1,18 @@
 <template>
-  <NSpace wrap :size="[14, 14]" justify="start">
-    <PokemonCard
-      v-for="card in filteredCards"
-      :key="card.id"
-      :card="card"
-      :size="size"
-      :selectable="selectable"
-      :selected="selectedSet.has(String(card.id))"
-      :disabled="isCardDisabled(String(card.id))"
-      @select="toggleCard"
-    />
-  </NSpace>
+  <!-- Responsive grid for displaying cards -->
+  <NGrid responsive="screen" :cols="gridCols" :x-gap="12" :y-gap="12">
+    <NGridItem v-for="card in filteredCards" :key="card.id">
+      <!-- Card component with selection logic -->
+      <PokemonCard
+        :card="card"
+        :size="size"
+        :selectable="selectable"
+        :selected="selectedSet.has(String(card.id))"
+        :disabled="isCardDisabled(String(card.id))"
+        @select="toggleCard"
+      />
+    </NGridItem>
+  </NGrid>
 </template>
 
 <script setup lang="ts">
@@ -19,6 +21,7 @@ import { computed } from 'vue'
 import type { Card } from '../../types/index.js'
 import PokemonCard from './PokemonCard.vue'
 
+// Props for card grid configuration
 const props = withDefaults(
   defineProps<{
     cards: Card[]
@@ -37,17 +40,26 @@ const props = withDefaults(
   },
 )
 
+// Emits for selection events
 const emit =
   defineEmits<(e: 'update:selectedIds' | 'toggle', ids: string[]) => void>()
 
+// Set of currently selected card IDs
 const selectedSet = computed(() => new Set(props.selectedIds.map(String)))
 
+// Responsive columns based on card size
+const gridCols = computed(() =>
+  props.size === 'sm' ? '2 m:3 l:4' : '1 m:2 l:3',
+)
+
+// Filter cards by search term
 const filteredCards = computed(() => {
   const term = props.searchTerm.trim().toLowerCase()
   if (!term) return props.cards
   return props.cards.filter((card) => card.name.toLowerCase().includes(term))
 })
 
+// Disable card if selection limit reached
 const isCardDisabled = (cardId: string) => {
   const normalizedId = String(cardId)
   if (!props.selectable) return false
@@ -56,6 +68,7 @@ const isCardDisabled = (cardId: string) => {
   return selectedSet.value.size >= props.maxSelected
 }
 
+// Toggle card selection
 const toggleCard = (cardId: string | number) => {
   const normalizedId = String(cardId)
   if (!props.selectable) return
@@ -74,3 +87,10 @@ const toggleCard = (cardId: string | number) => {
   emit('toggle', nextIds)
 }
 </script>
+
+<style scoped>
+.pokemon-card {
+  width: 100%;
+  box-sizing: border-box;
+}
+</style>

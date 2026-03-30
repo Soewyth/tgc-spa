@@ -1,7 +1,9 @@
 <template>
   <div class="container">
+    <!-- Card for deck details -->
     <NCard :title="deck?.name || 'Detail du deck'" class="page-card">
       <template #header-extra>
+        <!-- Edit deck button -->
         <NButton
           type="primary"
           size="small"
@@ -13,6 +15,7 @@
       </template>
 
       <NSpin :show="isLoading">
+        <!-- Error alert -->
         <NAlert
           v-if="errorMessage"
           type="error"
@@ -22,12 +25,14 @@
           {{ errorMessage }}
         </NAlert>
 
+        <!-- Deck cards list -->
         <NSpace v-else-if="deck" vertical :size="16">
           <NText class="count-text">{{ deckCards.length }} / 10 cartes</NText>
 
           <CardGrid :cards="deckCards" size="sm" />
         </NSpace>
 
+        <!-- Empty state if deck not found -->
         <NEmpty v-else description="Deck introuvable" />
       </NSpin>
     </NCard>
@@ -110,7 +115,7 @@ onMounted(() => {
 .container {
   display: flex;
   justify-content: center;
-  padding-top: 28px;
+  padding: 28px 16px 24px;
 }
 
 .page-card {
@@ -125,9 +130,9 @@ onMounted(() => {
   margin-bottom: 12px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .container {
-    padding-top: 16px;
+    padding: 16px 12px 20px;
   }
 }
 </style>

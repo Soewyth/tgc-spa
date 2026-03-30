@@ -199,11 +199,17 @@ onMounted(() => {
 .container {
   display: flex;
   justify-content: center;
-  padding-top: 28px;
+  padding: 28px 16px 24px;
 }
 
 .page-card {
   width: min(100%, 860px);
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 16px 12px 20px;
+  }
 }
 
 .counter-text {

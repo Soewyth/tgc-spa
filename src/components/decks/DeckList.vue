@@ -1,11 +1,14 @@
 <template>
+  <!-- Deck list with responsive grid -->
   <NCard title="Mes decks" class="deck-list">
     <template #header-extra>
+      <!-- Button to create a new deck -->
       <NButton size="small" type="primary" @click="handleCreate"
         >Creer un deck</NButton
       >
     </template>
 
+    <!-- Search input for decks -->
     <NInput
       v-model:value="searchTerm"
       size="large"
@@ -14,6 +17,7 @@
       class="mb-12"
     />
 
+    <!-- Error alert if needed -->
     <NAlert v-if="errorMessage" type="error" :show-icon="true" class="mb-12">
       {{ errorMessage }}
     </NAlert>
@@ -24,9 +28,11 @@
         description="Aucun deck pour le moment"
       />
 
-      <NList v-else hoverable bordered>
-        <NListItem v-for="deck in filteredDecks" :key="deck.id">
-          <NThing>
+      <!-- Responsive grid for deck cards -->
+      <NGrid v-else responsive="screen" cols="1 m:2" :x-gap="16" :y-gap="16">
+        <NGridItem v-for="deck in filteredDecks" :key="deck.id">
+          <!-- Deck card with preview and actions -->
+          <NCard size="small" hoverable class="deck-card">
             <template #header>
               <NSpace
                 align="center"
@@ -38,6 +44,7 @@
               </NSpace>
             </template>
 
+            <!-- Preview of cards in the deck -->
             <div class="deck-preview" aria-label="Apercu des cartes du deck">
               <img
                 v-for="card in getDeckPreviewCards(deck)"
@@ -51,6 +58,7 @@
 
             <template #footer>
               <NSpace :size="8" justify="end">
+                <!-- Deck actions: view, edit, delete -->
                 <NButton size="small" tertiary @click="handleView(deck.id)"
                   >Voir</NButton
                 >
@@ -63,14 +71,13 @@
                   type="error"
                   :loading="deletingDeckId === deck.id"
                   @click="handleDelete(deck.id)"
+                  >Supprimer</NButton
                 >
-                  Supprimer
-                </NButton>
               </NSpace>
             </template>
-          </NThing>
-        </NListItem>
-      </NList>
+          </NCard>
+        </NGridItem>
+      </NGrid>
     </NSpin>
   </NCard>
 
@@ -143,14 +150,13 @@ const pendingDeleteDeckName = computed(() => {
   return deck?.name ?? 'ce deck'
 })
 
-// get decks and cards from the api and store them in the decks and cardCatalog references
 const fetchDecks = async () => {
   try {
     errorMessage.value = ''
     isLoading.value = true
-    decks.value = await api.getMyDecks() // get all the decks of the user
+    decks.value = await api.getMyDecks()
     try {
-      cardCatalog.value = await api.getCards() // get all the cards of the deck (with only id and cardId)
+      cardCatalog.value = await api.getCards()
     } catch {
       cardCatalog.value = []
     }
@@ -162,7 +168,6 @@ const fetchDecks = async () => {
   }
 }
 
-// get the full card details for the deck preview
 const getDeckPreviewCards = (deck: Deck): Card[] => {
   return deck.cards
     .map(
@@ -225,6 +230,10 @@ onMounted(() => {
 
 .mb-12 {
   margin-bottom: 12px;
+}
+
+.deck-card {
+  height: 100%;
 }
 
 .deck-preview {
