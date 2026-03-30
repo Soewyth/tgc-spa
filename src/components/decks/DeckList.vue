@@ -128,13 +128,14 @@ const pendingDeleteDeckName = computed(() => {
   return deck?.name ?? 'ce deck'
 })
 
+// get decks and cards from the api and store them in the decks and cardCatalog references
 const fetchDecks = async () => {
   try {
     errorMessage.value = ''
     isLoading.value = true
-    decks.value = await api.getMyDecks()
+    decks.value = await api.getMyDecks() // get all the decks of the user
     try {
-      cardCatalog.value = await api.getCards()
+      cardCatalog.value = await api.getCards() // get all the cards of the deck (with only id and cardId)
     } catch {
       cardCatalog.value = []
     }
@@ -146,6 +147,7 @@ const fetchDecks = async () => {
   }
 }
 
+// get the full card details for the deck preview
 const getDeckPreviewCards = (deck: Deck): Card[] => {
   return deck.cards
     .map(

@@ -57,6 +57,7 @@ const deckId = computed(() => {
   return typeof rawId === 'string' ? rawId : ''
 })
 
+// Compute the full card details for the deck
 const deckCards = computed(() => {
   if (!deck.value) return []
 
@@ -69,7 +70,7 @@ const deckCards = computed(() => {
     })
     .filter((card): card is Card => Boolean(card))
 })
-
+// fetch the deck details from the api and store it in the deck ref
 const fetchDeck = async () => {
   if (!deckId.value) {
     errorMessage.value = 'Identifiant de deck invalide'
@@ -81,7 +82,7 @@ const fetchDeck = async () => {
     errorMessage.value = ''
     deck.value = await api.getDeck(deckId.value)
     try {
-      cardCatalog.value = await api.getCards()
+      cardCatalog.value = await api.getCards() // all the cards
     } catch {
       // Deck details can still render using embedded card data.
       cardCatalog.value = []
@@ -94,7 +95,7 @@ const fetchDeck = async () => {
     isLoading.value = false
   }
 }
-
+// handleEdit -> navigate to the deck edit page
 const handleEdit = async () => {
   if (!deckId.value) return
   await router.push(ROUTES.deckEdit(deckId.value))

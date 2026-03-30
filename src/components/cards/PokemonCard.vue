@@ -28,8 +28,8 @@
     <NText strong class="card-name">{{ card.name }}</NText>
 
     <div class="stats-row">
-      <NText>HP: {{ card.hp }}</NText>
-      <NText>ATK: {{ card.attack }}</NText>
+      <NText>❤️ {{ card.hp }}</NText>
+      <NText>⚔️ {{ card.attack }}</NText>
     </div>
 
     <div v-if="hasCurrentHp" class="hp-track">
